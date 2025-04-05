@@ -1,7 +1,7 @@
 #include "kernel.h"
 
 void kernel_main() {
-    clear_sceen();
+    clear_screen();
 
     kprint("Welcome to OS!\n");
 
