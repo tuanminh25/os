@@ -89,3 +89,19 @@ ie here is at 0xB8000
     + The video memory at 0xB8000 is actually part of the VGA (Video Graphics Array) hardware, not the CPU
     + When the system boots in text mode, the BIOS/firmware configures the hardware 
     + so that writes to this specific memory address range get redirected to the video display hardware
+
+
+2. is screen i o is actually like 2d array kind of thing? where each pixel representing 1 bit
+The screen I/O in this code is indeed organized like a 2D array, but it's not working with pixels
+It's working with text characters in VGA text mode
+Each position in this array holds a 16-bit value (uint16_t) that contains
+    - 8 bits for the ASCII character code
+    - 4 bits for background color
+    - 4 bits for foreground color
+
+3. why we have to use unsigned int here?
+    - Memory addresses are always positive values
+    - The bit manipulation being done combines character data with color attributes
+    - using unsigned integers prevents potential issues with sign extension
+    - Video memory access needs to be precise
+    - unsigned values give a clear, predictable range (0 to 65535 for uint16_t)
