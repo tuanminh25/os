@@ -63,3 +63,17 @@ kernel_stack_bottom marks the beginning of this space
 kernel_stack_top marks the end
 stacks typically grow downward in x86 
 -> also why stack pointer is set at the top
+
+
+in kernel.h
+
+The most basic thing we have to write for our libs:
+1. Char def
+2. Video output
+3. Screen i/o
+4. hardware driver
+    - init_idt() - Sets up the Interrupt Descriptor Table,
+    which is necessary for handling interrupts from hardware and software
+
+    - init_keyboard() - Initializes keyboard input, 
+    one of the most basic input devices
