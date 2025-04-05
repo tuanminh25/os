@@ -66,7 +66,7 @@ void kprint(const char *str) {
 }
 
 // Print string at specified pos
-void kprint(const char *str, int col, int row) {
+void kprint_at(const char *str, int col, int row) {
     cursor_x = col;
     cursor_y = row;
     kprint(str);

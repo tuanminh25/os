@@ -105,3 +105,89 @@ Each position in this array holds a 16-bit value (uint16_t) that contains
     - using unsigned integers prevents potential issues with sign extension
     - Video memory access needs to be precise
     - unsigned values give a clear, predictable range (0 to 65535 for uint16_t)
+
+
+in idt.cpp and idt_load.asm
+
+1. What is an Interrupt Descriptor Table and what is it used for?
+The Interrupt Descriptor Table (IDT) is a data structure used in x86 architecture to handle interrupts
+a lookup table that tells the CPU what to do when an interrupt occurs.
+
+When an interrupt happens, the processor uses the interrupt number to index into this table to find the appropriate handler function.
+
+Interrupts can be:
+    - Hardware interrupts (keyboard presses, timer ticks)
+    - Software interrupts (programmed exceptions)
+    - CPU exceptions (divide by zero, page faults)
+
+2. What is __attribute__((packed))
+This is a GCC compiler directive that tells the compiler not to add any padding between structure members for memory alignment
+Normally, the compiler might add padding bytes between structure members to optimize memory access
+
+With packed, the structure will use exactly the minimum amount of memory needed
+important for hardware-defined structures like the IDT where the memory layout must match exactly what the CPU expects
+
+3. Why use different size integers (uint8_t, uint16_t, uint32_t)?
+uint8_t: 8-bit/1-byte value
+uint16_t: 16-bit/2-byte value
+uint32_t: 32-bit/4-byte value
+
+The IDT structure follows Intel's defined format where each field has a specific size. How about AMD? 
+Using the exact size types ensures the structure layout matches what the CPU expects, with no wasted space or misalignments.
+
+4. What is asm volatile("sti");?
+This is inline assembly code that executes the x86 instruction sti (Set Interrupt Flag)
+This instruction enables interrupts by setting the interrupt flag in the CPU's EFLAGS register
+
+The volatile keyword tells the compiler not to optimize this instruction away
+as it has important side effects (enabling interrupts) that must occur exactly where specified
+
+5. What are eax, [esp + 4], and lidt [eax]?
+eax: A 32-bit general-purpose register in x86 architecture
+
+[esp + 4]: Accessing memory at address ESP+4
+ESP is the stack pointer register, and this is accessing the first parameter passed to the function
+(in x86 calling convention, parameters are pushed onto the stack)
+
+lidt [eax]
+The LIDT instruction loads the Interrupt Descriptor Table register 
+with the address stored in the memory location pointed to by EAX
+
+Together, this code takes the pointer to the IDT (passed as a parameter)
+loads it into the CPU's IDT register, telling the CPU where to find the interrupt handlers
+
+6. What is the global keyword in assembly?
+The global keyword (or directive) in assembly makes a label (function name) visible to the linker.
+This allows the function to be called from other object files during linking.
+
+In this case, global load_idt makes the load_idt function callable from C/C++ code,
+allowing the C++ code to call this assembly function to load the IDT.
+
+7. what happen if we dont declare the interuption descriptor table ? 
+ie what happens when we just divide a number by 0 without exception handler? 
+will that freeze the cpu?
+
+
+a. Without an IDT:
+When the CPU starts, it looks for interrupt handlers at fixed memory locations 
+(called the Real Mode Interrupt Vector Table, starting at address 0)
+
+In protected mode, without a properly configured IDT, the CPU doesn't know where to find exception handlers.
+
+b. Division by Zero Scenario
+    + When a division by zero occurs, the CPU tries to trigger interrupt 0 (the divide error exception)
+    + It looks for the handler address in the IDT
+    + If no valid handler is found (or the IDT isn't properly set up),
+    the CPU enters a state called "double fault" (trying to handle the error of not having a handler)
+    + If there's no double fault handler either, it may lead to a "triple fault"
+
+c. Triple Fault: 
+A triple fault is the CPU's last resort when it can't handle an exception properly.
+This typically causes a processor reset or system reboot on physical hardware
+
+d. In QEMU:
+When running in an emulator like QEMU
+a triple fault will usually cause the virtual machine to reset or display an error message
+depending on configuration.
+
+-- System can still be booted without IDT
