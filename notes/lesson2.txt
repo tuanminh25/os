@@ -1,0 +1,65 @@
+## Milestone 2: Bare Minimum Kernel - Overview
+# Flow for the Kernel
+
+1. Bootloader loads kernel into memory
+
+2. Bootloader transfers control to kernel entry point
+
+3. Kernel initializes:
+    + CPU state
+    + Video output
+    + Interrupt handlers
+    + Basic keyboard input
+
+
+Question:
+1. What is CLI?
+cli = "Clear Interrupt Flag." - Disable hardware interrupts by clearing interrupt flag in CPU flag register
+- When disabled, cpu wont respond to external interrupt request from hardware device (why?)
+
+2. Flow of program kernel_entry.asm 
+    - The program begins at _start
+    - Sets up the stack pointer (esp) to point to the top of the kernel stack
+    - Calls the C++ function kernel_main (defined elsewhere)
+    - If kernel_main ever returns (which it typically shouldn't in an OS kernel):
+        + Disables interrupts with cli
+        + Halts the CPU with hlt
+        + If execution somehow continues, the jmp $ creates an infinite loop
+
+3. What is _start and when is it triggered
+_start is the entry point of the kernel. It's the first code executed when control is transferred to the kernel from the bootloader
+
+The bootloader loads the kernel into memory and jumps to this entry point
+
+The global _start directive makes this symbol visible to the linker so it can be referenced from outside this file.
+
+4. [bits 32] vs [bits 16] for bootloader
+[bits 16] is used for the bootloader because the CPU starts in 16-bit real mode when a computer boots up.
+
+[bits 32] is used here because this code is for the kernel which runs after the bootloader has switched the CPU to 32-bit protected mode.
+
+The change is necessary because 32-bit protected mode offers memory protection, larger address space, and other features needed for a modern OS.
+
+5. What is section .bss?
+The .bss section is used for uninitialized data in assembly and C programs. 
+Variables in this section are allocated space in memory but aren't given initial values (they're zero-initialized by default)
+
+In this code, it's used to reserve space for the kernel stack.
+
+6. Kernel and kernel stack:
+Kernel: The kernel is the core component of an operating system 
+    + that manages system resources
+    +  provides hardware abstraction
+    +  offers services to applications.
+    + It's the first program loaded after the bootloader
+    + direct control over hardware.
+
+Kernel stack: dedicated area of memory used for 
+    + function calls, 
+    + local variables
+    +  procedure returns within the kernel code
+
+kernel_stack_bottom marks the beginning of this space
+kernel_stack_top marks the end
+stacks typically grow downward in x86 
+-> also why stack pointer is set at the top
