@@ -191,3 +191,62 @@ a triple fault will usually cause the virtual machine to reset or display an err
 depending on configuration.
 
 -- System can still be booted without IDT
+
+
+
+in keyboard.cpp
+1. About inb and outb:
+    - inb reads data from a specified I/O port.
+    It's a wrapper around the x86 assembly instruction inb
+    lets your CPU read from hardware ports 
+    In this case, it's reading from the keyboard's data port (0x60) to get keyboard input (scancodes).
+
+    - outb writes data to a specified I/O port
+    It's not for screen output
+    but for sending commands to hardware devices.
+
+2. About outb(0x21, inb(0x21) & ~2)
+    - This line enables the keyboard interrupt (IRQ1) by:
+        + Reading the current value from port 0x21
+        (Programmable Interrupt Controller mask register)
+        + Performing a bitwise AND with ~2 (which clears the second bit)
+        + Writing it back to port 0x21
+This operation unmasks (enables) the keyboard interrupt so OS can receive keyboard events.
+
+3. About keyboard port
+The keyboard port (0x60) isn't the physical USB/PS2 connector.
+It's a specific memory-mapped I/O address that the keyboard controller makes available to the CPU
+It's a software interface to communicate with the keyboard controller chip
+allowing code to read input from whatever keyboard is physically connected.
+
+
+4. so "0x60" is an memory address for keyboard interface? like it is specified?
+It's not a regular memory address, but an I/O port address
+In x86 architecture, I/O ports are a separate address space from memory, specifically designed for hardware communication
+Port 0x60 is standardized as the keyboard data port across x86 systems
+when you read from it, you get the latest scancode from the keyboard controller
+
+5. can inb be understood as translating the input keyboard (physical) to asm code to the os?
+Yes, understanding is close.
+When you press a key, the keyboard controller converts that physical keypress into a "scancode"
+(a numeric value identifying which key was pressed)
+The inb function reads this scancode from port 0x60
+which your OS can then interpret
+
+6. About outb: sends commands to hardware, ex:
+// Turn on the PC speaker
+outb(0x43, 0xB6);  // Tell the PIT (timer) to prepare for frequency data
+outb(0x42, 0x1F);  // Low byte of frequency value
+outb(0x42, 0x4F);  // High byte of frequency value
+outb(0x61, inb(0x61) | 3);  // Turn on the speaker by setting bits in port 0x61
+
+flow of this code:
+physical keyboard → keyboard controller → I/O ports (0x60) → inb → operating system code
+
+7. why in this map, there are alot of 0 in between keys?
+The zeros in the keyboard map represent scancodes that don't correspond to printable ASCII characters. These include
+
+- Special keys like Escape, Tab, Caps Lock, Shift, Ctrl, Alt, and function keys (F1-F12)
+- Navigation keys like arrows, Home, End, Page Up, Page Down
+- Control keys like Print Screen, Scroll Lock, Pause/Break
+- Reserved or unused scancodes in the standard set
