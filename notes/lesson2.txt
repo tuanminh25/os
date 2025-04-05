@@ -250,3 +250,45 @@ The zeros in the keyboard map represent scancodes that don't correspond to print
 - Navigation keys like arrows, Home, End, Page Up, Page Down
 - Control keys like Print Screen, Scroll Lock, Pause/Break
 - Reserved or unused scancodes in the standard set
+
+in linker.ld
+
+linker.ld defines how the different sections of kernel should be organized in memory
+1. ENTRY(_start)
+Sets the entry point of kernel to a function/label named _start
+This is where execution will begin when kernel is loaded.
+
+2. . = 0x100000;
+Sets the location counter to 1MB (0x100000 in hex).
+This means kernel will be loaded starting at the 1MB address in physical memory
+This is a common location because:
+    + The first 1MB is typically reserved for the BIOS, bootloader, and other low-level structures
+    + Many x86 systems can't boot from lower memory due to legacy reasons
+
+3. .text : { *(.text) }
+Collects all .text sections from all input files into a single output section
+The .text section contains executable code (actual program instructions).
+
+4. .data : { *(.data) }
+Similar to above, but for .data sections, which contain initialized global variables.
+
+.bss : { *(.bss) }: 
+Collects all .bss sections, which contain uninitialized global variables (these take up space in memory but not in the executable file).
+
+This script creates a flat memory layout where code comes first, followed by data, and finally BSS
+It's a minimal but functional layout for a simple kernel, ensuring kernel starts at the 1MB boundary and has its sections arranged in a logical order.
+
+
+
+what is .ld file?
+An .ld file is a linker script file used by the GNU linker (ld). 
+Its purpose is to control how the linker combines object files (.o files) into the final executable or binary.
+
+The linker script specifies:
+    - How different sections of code and data should be arranged in memory
+    - Where in memory the program should be loaded
+    - How to align sections in memory
+    - Which symbols should be exported
+    - The entry point of the program
+
+order in linker file matters!
