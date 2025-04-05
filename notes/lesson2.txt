@@ -77,3 +77,15 @@ The most basic thing we have to write for our libs:
 
     - init_keyboard() - Initializes keyboard input, 
     one of the most basic input devices
+
+in screen.cpp
+1. is it designed in each cpu that a certain mem address is for video memory? 
+ie here is at 0xB8000
+
+- The memory address 0xB8000 is not designed into the CPU itself
+- it's a specific hardware convention in the IBM PC architecture
+- its descendants (including modern x86 systems)
+- This address is part of the memory-mapped I/O system where
+    + The video memory at 0xB8000 is actually part of the VGA (Video Graphics Array) hardware, not the CPU
+    + When the system boots in text mode, the BIOS/firmware configures the hardware 
+    + so that writes to this specific memory address range get redirected to the video display hardware

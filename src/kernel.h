@@ -7,7 +7,7 @@ typedef unsigned int uint32_t;
 
 // Dimension
 #define VGA_WIDTH 80
-#define VGA_WIDTH 25
+#define VGA_HEIGHT 25
 
 // Screen I/O
 void clear_screen();
