@@ -9,9 +9,21 @@ bootloader flow:
 
 3. Print string routine
 - Save registers (AX, SI) on the stack
+- Set up BIOS teletype function (INT 0x10, AH=0x0E)
+- Loop through each character:
+    + Load byte from memory at SI into AL, increment SI
+    + Test if character is zero (string terminator)
+    + If zero, exit loop
+    + Otherwise, call BIOS to print the character
 
+- Restore registers and return
 
+4. Halt
+    + Enter an Infinite loop with jmp $ to current address 
 
+5. Boot Signature:
+    + Pad the binary to 510 bytes
+    + Add the boot signature (0xAA55) at the end to make it a valid bootloader
 
 assembler directives
 [bits 16] : tell nasm this is 16 bit code
@@ -30,3 +42,48 @@ xor ax, ax ; Clear AX register
 
 2. SI register: source index - use for string operations and memory addressing
 
+3. BIOS Teletype Function (INT 0x10, AH=0x0E)
+    + INT 0x10 is a BIOS interrupt for video services
+    + When AH=0x0E, it activates the "teletype" function
+    + This function displays a character on screen and advances the cursor
+    + AL register holds the character to display
+    + This was a standard way to output text in the BIOS era before operating systems loaded
+
+4. Segment Registers (DS, ES, SS)
+    + These are actual hardware registers in the CPU, not variables
+    + DS = Data Segment: Points to where program data is stored
+    + ES = Extra Segment: Additional segment for string operations
+    + SS = Stack Segment: Points to where the stack is located
+    + In 16-bit real mode, memory addressing uses segment pairs
+    + Setting these to zero simplifies memory addressing in the bootloader
+
+5. Why have to "hang" definitely
+
+- If not:
+
++ The CPU would continue executing whatever random data/code happens to be in memory after the bootloader
+
++ This would likely cause unpredictable behavior, crashes, or random memory execution
+
++ The system would appear to malfunction rather than displaying the "Hello World" message
+
+- In a real life scenario, bootloader will transfer control to the OS kernel after initialization.
+However, til now, it will just hang with the message to prevent unexpected behavior
+
+- In real bootloader, it would be replaced to:
++ Load the actual OS kernel from disk
++ Transfer control to the kernel
++ Switch to protected mode
++ Set up more advanced system features
+
+6. For different CPU, changes for both assembly instructions and directives are needed. Because their boot mechanism can be different as well
+
+7. lodsb 
+string operation instruction 
+that loads a byte from memory at the address pointed to by SI into the AL register
+
+8. int 0x10
++ Triggers software interrupt 0x10, which calls the BIOS video services
++ Since AH was previously set to 0x0E (the teletype function)
++ The BIOS will display the character in AL on the screen and advance the cursor
++ This is how the bootloader outputs characters to the display
