@@ -1,0 +1,32 @@
+bootloader flow:
+1. Init
+- Set up segment register (DS,ES, SS) to 0
+- Set up stack pointer
+
+2.Print message
+- Load address of hello message into SI
+- Call the print_string routine
+
+3. Print string routine
+- Save registers (AX, SI) on the stack
+
+
+
+
+assembler directives
+[bits 16] : tell nasm this is 16 bit code
+[org 0x7c00] : bios loads bootloader at this memory address
+
+Question and answer:
+xor ax, ax ; Clear AX register
+1. explain why use ax register, the use of it, why using xor here helps?
+
+- ax is the 16 bit general purpose register in x86 architecture
+- ax is used to set up segment register to 0
+- xor clear register faster 
++ more compact than mov ax, 0 (fewer bytes)
++ faster to execute
++ xor any val with itself result in 0
+
+2. SI register: source index - use for string operations and memory addressing
+
