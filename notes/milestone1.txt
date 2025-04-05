@@ -1,0 +1,67 @@
+## Bootloader Dev
+
+# Real vs protected mode
+
+- Real mode is initial operating state of x86 processors with direct memory access but limited to 1MB of addressable memory
+
+- Protected mode enables memory protection, virtual memory and access to more ram
+
+Memory segmentation: a memory management scheme that divides memory into segments (code, data, stack, etc), each with specific purposes and access permissions
+
+## Implementation steps
+
+1. Create a bootloader in assembly 
+
+- BIOS loads the first 512 bytes (boot sector) from storage device
+
+- 16-bit assembly code must fit within this space and end with boot signature (0xAA55)
+
+- Setting up stack and segment registers establishes working memory space
+
+- Print a message confirms bootloader is executing properly
+
+2. Enable A20 line
+
+The A20 liine is a legacy hardware feature!
+
+- Early PC has a quirkc where memory would "wrap around" after 1MB
+
+- Enabling the A20 line removes this limitation
+
+- This is necessary to access memory beyond the first 1MB
+
+3. Switch from 16-bit real mode to 32-bit protected mode
+
+This step enables modern OS feature:
+
+- Global Descripter Table (GDT) defines memory segmentss and their properties
+
+- Loading the GDT tells the CPU about your memory layout
+
+- The actual mode swithch changes how the CPU interprets instructions and addresses memory
+
+4. Load kernel from disk
+
+After setting up the environment, need to load the actual OS
+
+- BIOS provides functions to read from disk (INT 13h services)
+
+- Specify which sectors to read and where to load them in memory
+
+- Transfer kernel code from storage to RAM where it can execute
+
+# Testing instructions
+
+1. Compile assembly file to binary format
+nasm -f bin bootloader.asm -o bootloader.bin 
+
+
+2. run bootloader in QEMU emulator, treating it as a floppy disk  
+qemu-system-i386 -fda bootloader.bin
+
+# Required tools
+1. NASM - assembler converts assembly to machine code
+2. QEMU - emulator to test bootloader without rebooting computer
+
+# Installations
+sudo apt-get install nasm qemu-system-x86
