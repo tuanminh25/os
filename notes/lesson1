@@ -21,4 +21,9 @@ x86 assembly language
 - BIOS looks into special EFI partitions
 - OS must be compiled as EFI program
 
+## The stack
+- memory first in first out
+- save return address when calling func
+- grow download
 
+## interupt

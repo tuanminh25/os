@@ -4,3 +4,13 @@ halt: stop cpu from executing - can be resumed by an interup
 ## jmp
 jump to somewhere
 
+## [var]
+memory address of var
+
+## lodsb, lodsw, lodsd
+these instruction load byte/ word/ double
+from ds:si into al/ax/eax
+then increment SI by the number of bytes loaded
+
+## jz
+jump if zero flag is set
