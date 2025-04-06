@@ -14,3 +14,18 @@ then increment SI by the number of bytes loaded
 
 ## jz
 jump if zero flag is set
+
+## pusha
+save all register to stacks
+
+## stc
+set carry flag, some BIOS dont set it
+
+## popa
+return all register val
+
+##test
+actually an AND operation
+
+## cli
+disable the interuption

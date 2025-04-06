@@ -2,4 +2,4 @@
 
 In this project, the os will be run using the qemu emulator
 
-[Hello OS Screenshot](helloOS.png)
+[Hello OS Screenshot](pics/helloOS.png)
