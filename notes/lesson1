@@ -1,0 +1,24 @@
+x86 assembly language
+
+## How computer starts up
+
+1. BIOS is copied from a ROM chip into RAM
+2. BIOS starts executing code
+- init hardware
+- runs some tests (POST = power-on self test)
+3. BIOS searches for an OS to start
+4. BIOS loads and starts the OS
+5. OS runs
+
+
+### Type of booting
+## Legacy booting
+- BIOS loads furst sector of each bootable device into memory at 0x7C00
+- BIOS checks for 0xAA55 signature
+- If found, starts executing code
+
+## EFI 
+- BIOS looks into special EFI partitions
+- OS must be compiled as EFI program
+
+

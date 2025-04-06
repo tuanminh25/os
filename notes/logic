@@ -1,0 +1,9 @@
+$
+equal to mem offset of current line
+
+$$
+special symbol which equal to mem offset of 
+the begining of current program 
+
+$-$$
+size of our program so far

@@ -1,0 +1,6 @@
+## hlt
+halt: stop cpu from executing - can be resumed by an interup
+
+## jmp
+jump to somewhere
+

@@ -1,0 +1,24 @@
+directive: tell the assembler
+instruction: will be translated into machine code
+
+## org
+org : tells assembler where we expect our code to be loaded. The assembler uses 
+this infor to calculate label addresses
+
+org 0x7C00 - change 0x7C00 mean tell assembler to load our code at some 
+other offset position in memory
+
+
+## bits
+tells assembler to emit 16/32/64 bit code
+this wont run the code in 32 bit code, it just tells the assembler to emit 32 bit code
+
+## db byte1, byte2, byte3,...
+define byte(s). Write given bytes to the assembled binary file
+
+## times number instruction/ data
+repeat given instruction or piece of data a number of times
+
+# dw word1
+define words, write given words (2bytes value encoded in little endian) to
+the assembled bianry file
