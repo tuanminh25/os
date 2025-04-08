@@ -1,0 +1,17 @@
+To read a FAT12 filesystem image, you need these key components:
+
+1. Boot sector parser - reads filesystem metadata like sector size, sectors per cluster, and FAT location
+2. FAT table reader - loads the File Allocation Table that tracks cluster chains
+3. Root directory reader - parses directory entries containing filenames and file metadata
+4. Cluster chain follower - reads file data by following linked clusters in the FAT
+
+The essential data structures are:
+- Boot sector structure (contains filesystem parameters)
+- Directory entry structure (stores file metadata)
+- FAT lookup logic (converts between clusters and physical sectors)
+
+The critical process involves:
+1. Reading the boot sector first for filesystem parameters
+2. Loading the FAT to understand cluster chains
+3. Reading the root directory to find files
+4. Following cluster chains in the FAT to read complete files
