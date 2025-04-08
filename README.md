@@ -21,3 +21,5 @@ I'm currently working on two parallel tracks:
 ## Contributions
 
 This project can serve as an educational resource for others learning OS development.
+
+Thanks to NANOBYTE for providing the inspiration and tutorials that made this project possible.
