@@ -6,15 +6,26 @@ This personal project represents both my development work and learning journey i
 
 ## Current Development Focus
 
-I'm currently working on two parallel tracks:
+**FAT12 Filesystem Implementation** - Learning and implementing disk operations for this simple filesystem format, which serves as a foundation for storage management.
 
-1. **FAT12 Filesystem Implementation** - Learning and implementing disk operations for this simple filesystem format, which serves as a foundation for storage management.
+For now, FAT12 in c has been working, here is how to test fat.c 
 
-2. **Memory Allocation Simulator Tool** - Developing a testing environment that simulates various memory allocation strategies (first-fit, best-fit, worst-fit). This tool will:
-   - Visualize memory allocation in real-time
-   - Help me understand fragmentation issues
-   - Provide a testbed for optimization before implementing in the actual OS
-   - Serve as a critical component when advanced memory management is integrated
+From the root folder of project,
+1. Build the program by running: 
+
+```
+make
+```
+
+
+2. Run test for fat.c by runing:
+```
+./build/tools/fat ./build/main_floppy.img "TEST    TXT"
+```
+
+
+
+Current state of FLOW OS via qemu emulator:
 
 ![Hello OS Screenshot](pics/helloOS.png)
 
