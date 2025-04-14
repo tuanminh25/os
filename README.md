@@ -19,10 +19,16 @@ Project Goals:
 
 **FAT12 Filesystem Implementation** - Learning and implementing disk operations for this simple filesystem format, which serves as a foundation for storage management.
 
-For now, FAT12 in c has been working, here is how to test fat.c 
+For now, FAT12 in c has been working, the following step is how to test fat.c 
+
+## Installation
+0. Git clone
+```
+git clone git@github.com:tuanminh25/os.git
+```
 
 From the root folder of project,
-1. Build the program by running: 
+2. Build the program by running: 
 
 ```
 make
@@ -34,9 +40,11 @@ make
 ./build/tools/fat ./build/main_floppy.img "TEST    TXT"
 ```
 
+## Extra tools development
 
+- I plan to implement a memory allocation simulator once we reach to the point of managing memory.  
 
-Current state of FLOW OS via qemu emulator:
+## Current state of FLOW OS via qemu emulator:
 
 ![Hello OS Screenshot](pics/helloOS.png)
 
