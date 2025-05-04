@@ -15,6 +15,8 @@ Project Goals:
 
 - Distribute as open-source software
 
+- "FLOW" - optimize for fast, smooth experience 
+
 ## Current Development Focus
 
 **FAT12 Filesystem Implementation** - Learning and implementing disk operations for this simple filesystem format, which serves as a foundation for storage management.
@@ -22,20 +24,22 @@ Project Goals:
 For now, FAT12 in c has been working, the following step is how to test fat.c 
 
 ## Installation
-0. Git clone
+1. Git clone
 ```
 git clone git@github.com:tuanminh25/os.git
 ```
 
-From the root folder of project,
-2. Build the program by running: 
+
+2. Build the program by running : 
 
 ```
 make
 ```
 
+from the root folder of project.
 
-2. Run test for fat.c by runing:
+3. Run test for fat.c by runing:
+
 ```
 ./build/tools/fat ./build/main_floppy.img "TEST    TXT"
 ```
