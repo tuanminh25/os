@@ -24,19 +24,19 @@ Project Goals:
 For now, FAT12 in c has been working, the following step is how to test fat.c 
 
 ## Installation
+
 1. Git clone
+
 ```
 git clone git@github.com:tuanminh25/os.git
 ```
 
 
-2. Build the program by running : 
+2. Navigate to root folder of the project and build the program by running : 
 
 ```
 make
 ```
-
-from the root folder of project.
 
 3. Run test for fat.c by runing:
 
