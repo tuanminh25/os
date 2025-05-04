@@ -1,17 +1,66 @@
-org 0x7C00
-bits 16
+; ////////////////////////////////////////////////////// Start up flow /////////////////////////////////////////////
+; Power on -> BIOS -> bootloader -> kernel -> operating system
+; BIOS looks for bootloader in the first 512 bytes (bootsector or MBR)
+; Bootloader: parses filesystem, loads kernel
+; Kernel: starts managing hardware, memory, launching user processes
+; //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+; ////////////////////////////////////////////////////// BIOS //////////////////////////////////////////////////////
+; BIOS: basic input output system - low level firmware code in chip of the motherboard
+;   + power on self test - check cpu,ram essential devices, displays error if soomething off
+;   + initialize hardware: prepare essential devices: disk drives, timers, display ...
+;   + find bootable devices: USB -> HDD -> CD , reads first 512 bytes (bootsector or MBR) from that device to memory at 0x7C00
+;   + transfer control to bootloader after boot sector is loaded
+;   + provides low level services
+;               int 13h read sectors from disk
+;               int 10h print char on screen
+;               int 16h wait for keypress
+; //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-%define ENDL 0x0D, 0x0A
+; ///////////////////////////////////////////////////// bootloader ////////////////////////////////////////////////
+; Definition:
+;       - small program that runs immediately after the computer is powered on
+;       - first software that bios or firmware loads into memory
 
-
+; Why does this matters?
+;       - It bridges the gap between OS and BIOS/UEFI
+;       - BIOS does not know filesystem/kernels/ modern OS structure but bootloader knows
 ;
-; FAT12 header
-; 
+;
+; It's flow on this file:
+;       - BIOS loads this file (bootloader) at OX7C00
+;       - Parsing and interpreting drive disk based on FAT12 file system (assume that input drive is FAT12 drive) 
+;       - Look for kernel binary file based on assumption 
+;       - Load kernel to memory and transfer control to kernel 
+;
+;
+; /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+; //////////////////// BIOS loads this file (bootloader) at OX7C00  ////////////////////////////////////////////////
+
+; Boot sector header and setup
+org 0x7C00                                          ; code will be loaded at memory 0x7C00 (standard location for BIOS loads the boot sector)
+bits 16                                             ; assembling for 16-bit mode
+; /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+; macro for new line CR+LF
+%define ENDL 0x0D, 0x0A                             
+
+; jump to start, skip FAT12 header 
+; nop is filler, making the jump exactly 3 bytes - required for bootsector
 jmp short start
 nop
 
-bdb_oem:                    db 'MSWIN4.1'           ; 8 bytes
+
+; //////////////////// FAT12 file system headers related  ////////////////////////////////////////////////
+bdb_oem:                    db 'MSWIN4.1'           ; 8 bytes OEM identifier - TODO: for what? 
+
+
+;
+; 1.44MB FAT12 floppy disk layout
+; 
 bdb_bytes_per_sector:       dw 512
 bdb_sectors_per_cluster:    db 1
 bdb_reserved_sectors:       dw 1
@@ -25,33 +74,37 @@ bdb_heads:                  dw 2
 bdb_hidden_sectors:         dd 0
 bdb_large_sector_count:     dd 0
 
-; extended boot record
-ebr_drive_number:           db 0                    ; 0x00 floppy, 0x80 hdd, useless
+; extended boot record - metadata used by FAT12 filesystem
+ebr_drive_number:           db 0                    ; 0x00 floppy, 0x80 hdd 
                             db 0                    ; reserved
+
 ebr_signature:              db 29h
 ebr_volume_id:              db 12h, 34h, 56h, 78h   ; serial number, value doesn't matter
 ebr_volume_label:           db 'FLOW     OS'        ; 11 bytes, padded with spaces
 ebr_system_id:              db 'FAT12   '           ; 8 bytes
+; ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-;
-; Code goes here
-;
 
+
+
+
+; ////////////////////////////////////// Bootloader code  ////////////////////////////////////////////////
 start:
-    ; setup data segments
-    mov ax, 0           ; can't set ds/es directly
+    ; setup data segments - registers and the stack
+    mov ax, 0                                       ; can't set ds/es directly
     mov ds, ax
     mov es, ax
     
     ; setup stack
     mov ss, ax
-    mov sp, 0x7C00              ; stack grows downwards from where we are loaded in memory
+    mov sp, 0x7C00                                  ; set stack from 0x7C00, stack grows downwards from there
 
-    ; some BIOSes might start us at 07C0:0000 instead of 0000:7C00, make sure we are in the
-    ; expected location
-    push es
+    ; This realigns CodeSegment:InstructionPointer to ensure proper execution, 
+    ; in case BIOS started at a segment other than 0000.
+    ; techincally ensuring that 
+    push es                                         ; ealier it is 0x0000
     push word .after
-    retf
+    retf                                            ; get physical address regarding to point 0x0000 rather than just current cs
 
 .after:
 
@@ -63,14 +116,17 @@ start:
     mov si, msg_loading
     call puts
 
+    
     ; read drive parameters (sectors per track and head count),
     ; instead of relying on data on formatted disk
+    ; technically calls BIOS INT 13h function 08h to get disk geometry
     push es
     mov ah, 08h
     int 13h
     jc floppy_error
     pop es
 
+    ; then store result
     and cl, 0x3F                        ; remove top 2 bits
     xor ch, ch
     mov [bdb_sectors_per_track], cx     ; sector count
@@ -78,6 +134,7 @@ start:
     inc dh
     mov [bdb_heads], dh                 ; head count
 
+    ; read FAT12 root directory
     ; compute LBA of root directory = reserved + fats * sectors_per_fat
     ; note: this section can be hardcoded
     mov ax, [bdb_sectors_per_fat]
@@ -97,9 +154,15 @@ start:
     jz .root_dir_after
     inc ax                              ; division remainder != 0, add 1
                                         ; this means we have a sector only partially filled with entries
+
+
+
+
+
+
 .root_dir_after:
 
-    ; read root directory
+    ; read root directory into memory
     mov cl, al                          ; cl = number of sectors to read = size of root directory
     pop ax                              ; ax = LBA of root directory
     mov dl, [ebr_drive_number]          ; dl = drive number (we saved it previously)
@@ -111,7 +174,7 @@ start:
     mov di, buffer
 
 .search_kernel:
-    mov si, file_kernel_bin
+    mov si, file_kernel_bin             ; search for kernel file bin: "file_kernel_bin"
     mov cx, 11                          ; compare up to 11 characters
     push di
     repe cmpsb
@@ -126,14 +189,14 @@ start:
     ; kernel not found
     jmp kernel_not_found_error
 
-.found_kernel:
+.found_kernel:                          ; when found the kernel, get starting clusters from directory entry
 
     ; di should have the address to the entry
     mov ax, [di + 26]                   ; first logical cluster field (offset 26)
     mov [kernel_cluster], ax
 
     ; load FAT from disk into memory
-    mov ax, [bdb_reserved_sectors]
+    mov ax, [bdb_reserved_sectors]      ; read FAT
     mov bx, buffer
     mov cl, [bdb_sectors_per_fat]
     mov dl, [ebr_drive_number]
@@ -144,6 +207,7 @@ start:
     mov es, bx
     mov bx, KERNEL_LOAD_OFFSET
 
+; Follow FAT chain to load all clusters of the file
 .load_kernel_loop:
     
     ; Read next cluster
@@ -186,6 +250,7 @@ start:
     mov [kernel_cluster], ax
     jmp .load_kernel_loop
 
+; When read is finished, jump to the already loaded kernel
 .read_finish:
     
     ; jump to our kernel
