@@ -54,9 +54,27 @@ jmp short start
 nop
 
 
-; //////////////////// FAT12 file system headers related  ////////////////////////////////////////////////
-bdb_oem:                    db 'MSWIN4.1'           ; 8 bytes OEM identifier - TODO: for what? 
 
+; //////////////////////////////////////// Metaphore  ////////////////////////////////////////////////
+; physical disk = empty room
+; file formating = design layout
+; bootloader = interpret those design into the room
+; os = tenant move into the room
+;
+; so that's why some modern machine, hardware can be run with different os
+; and some old one like floppy disk can not use ntfs
+; ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+; //////////////////// FAT12 file system headers related  ////////////////////////////////////////////////
+; assembler will run through everything in compilation
+; db, dw, dd will be "defined" at compilation time (initialized at compilation time)
+; everything down here is just metadata fields
+; bdb: bios data block
+
+; Technically required a tag defining that this is fat 12 
+bdb_oem:                    db 'MSWIN4.1'            
 
 ;
 ; 1.44MB FAT12 floppy disk layout
@@ -140,9 +158,12 @@ start:
 ; (ie track 5 on all heads forms cylinder 5)
 ; Cylinder techinically is to help read/write across all head at a specific sectors at the same time
 
+    ; cx is 16 bit register
+    ; cl is lower 8 of cx 
+    ; ch is upper 8 of cx
     ; then store result
     and cl, 0x3F                        ; remove top 2 bits containing cylinder number (not related here)
-    xor ch, ch
+    xor ch, ch                          ; clear ch 
     mov [bdb_sectors_per_track], cx     ; sector count
 
     inc dh
