@@ -89,7 +89,9 @@ ebr_system_id:              db 'FAT12   '           ; 8 bytes
 
 
 ; ////////////////////////////////////// Bootloader code  ////////////////////////////////////////////////
-start:
+
+; ////////////////////////////////////// Set up to correct mem address  //////////////////////////////////
+start: 
     ; setup data segments - registers and the stack
     mov ax, 0                                       ; can't set ds/es directly
     mov ds, ax
@@ -106,6 +108,8 @@ start:
     push word .after
     retf                                            ; get physical address regarding to point 0x0000 rather than just current cs
 
+
+; ////////////////////////////////////// Logic and interpret disk  //////////////////////////////////
 .after:
 
     ; read something from floppy disk
@@ -116,18 +120,28 @@ start:
     mov si, msg_loading
     call puts
 
-    
-    ; read drive parameters (sectors per track and head count),
-    ; instead of relying on data on formatted disk
-    ; technically calls BIOS INT 13h function 08h to get disk geometry
-    push es
-    mov ah, 08h
-    int 13h
-    jc floppy_error
+
+    ; Ask BIOS how many heads, sectors per track, cylinders this disk has
+    push es                             ; save es segment register to stack (prevent overwritten)
+    mov ah, 08h                         ; get drive parameter = disk geometry
+    int 13h                             ; call bios disk service 
+    jc floppy_error                     ; ah = 08h, int 13 returns to cf, jc (jump if carry check)
+                                        ; will jump to floppy_error when cf is equal to 1 (error)
+
     pop es
 
+; In physical disk hardware, cylinder does not exist, it is a mathematical tool
+; A disk drive contains set of platters. 
+;   Each platters contains 2 surfaces each surface has 1 head that can both read write
+;       Each head contains set of tracks 
+;           Each track contains set of sectors (typically 512 bytes)
+
+; Cylinder is pretty much cut vertically through all of them (assuming all of platters having same radius)
+; (ie track 5 on all heads forms cylinder 5)
+; Cylinder techinically is to help read/write across all head at a specific sectors at the same time
+
     ; then store result
-    and cl, 0x3F                        ; remove top 2 bits
+    and cl, 0x3F                        ; remove top 2 bits containing cylinder number (not related here)
     xor ch, ch
     mov [bdb_sectors_per_track], cx     ; sector count
 
