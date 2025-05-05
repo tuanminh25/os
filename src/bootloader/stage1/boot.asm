@@ -38,6 +38,15 @@
 ; /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+; Important pair to travel in memory stuff: 
+; Pair	                                Purpose
+; CS:IP	                                Code Segment & Instruction Pointer – where code is fetched from (for execution)
+; DS:SI	                                Data Segment & Source Index – used for reading data (e.g., strings, arrays)
+; ES:DI	                                Extra Segment & Destination Index – often used for writing data (e.g., movsb)
+; SS:SP	                                Stack Segment & Stack Pointer – for the stack (push/pop)
+; ES:BX	                                Commonly used with BIOS for data destination (as in your disk_read)
+
+
 ; //////////////////// BIOS loads this file (bootloader) at OX7C00  ////////////////////////////////////////////////
 
 ; Boot sector header and setup
@@ -203,17 +212,14 @@ start:
 
 
 
-
-
-
 .root_dir_after:
 
     ; read root directory into memory
     mov cl, al                          ; cl = number of sectors to read = size of root directory
-    pop ax                              ; ax = LBA of root directory
+    pop ax                              ; ax = LBA of root directory (calculated above)
     mov dl, [ebr_drive_number]          ; dl = drive number (we saved it previously)
-    mov bx, buffer                      ; es:bx = buffer
-    call disk_read
+    mov bx, buffer                      ; es:bx (extra segment - offset in that segment) = buffer 
+    call disk_read                      ; read disk sectors (lba) via BIOS
 
     ; search for kernel.bin
     xor bx, bx
@@ -380,6 +386,11 @@ puts:
 ;   - dh: head
 ;
 
+; Formula
+; Sector = (LBA mod sectorsPerTrack) + 1
+; Head = (LBA // sectorsPerTrack) mod headsPerCylinder
+; Cylinder = LBA // (sectorsPerTrack × headsPerCylinder)
+
 lba_to_chs:
 
     push ax
@@ -423,7 +434,7 @@ disk_read:
     push di
 
     push cx                             ; temporarily save CL (number of sectors to read)
-    call lba_to_chs                     ; compute CHS
+    call lba_to_chs                     ; compute CHS and set to registers
     pop ax                              ; AL = number of sectors to read
     
     mov ah, 02h
@@ -483,7 +494,11 @@ KERNEL_LOAD_SEGMENT     equ 0x2000
 KERNEL_LOAD_OFFSET      equ 0
 
 
+; 
+; 0x7C00 + 512 = 0x7E00
+; 
 times 510-($-$$) db 0
 dw 0AA55h
 
+; buffer = 0x7E00 (offset), ES = 0x0000 (or another valid segment)
 buffer:
