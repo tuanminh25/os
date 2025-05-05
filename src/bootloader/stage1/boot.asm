@@ -68,6 +68,7 @@ nop
 
 
 ; //////////////////// FAT12 file system headers related  ////////////////////////////////////////////////
+; simplified visualization: [Reserved sectors][FAT1][FAT2][Root Directory][Data Region]
 ; assembler will run through everything in compilation
 ; db, dw, dd will be "defined" at compilation time (initialized at compilation time)
 ; everything down here is just metadata fields
@@ -167,27 +168,37 @@ start:
     mov [bdb_sectors_per_track], cx     ; sector count
 
     inc dh
-    mov [bdb_heads], dh                 ; head count
+    mov [bdb_heads], dh                 ; heads count
 
-    ; read FAT12 root directory
+
+    ; From memory address of those predefined header
+    ; Work out where should be the root directory located
+
     ; compute LBA of root directory = reserved + fats * sectors_per_fat
     ; note: this section can be hardcoded
     mov ax, [bdb_sectors_per_fat]
     mov bl, [bdb_fat_count]
     xor bh, bh
-    mul bx                              ; ax = (fats * sectors_per_fat)
-    add ax, [bdb_reserved_sectors]      ; ax = LBA of root directory
+    mul bx                              ; ax = ax × ax = sectors_per_fat × fat_count
+                                        ; mul open like this means mul ax with bx
+                                        ; ax = (fats * sectors_per_fat)
+    add ax, [bdb_reserved_sectors]      ; ax = LBA (logical byte address) of root directory
     push ax
 
-    ; compute size of root directory = (32 * number_of_entries) / bytes_per_sector
+
+    ; compute number of sectors that root dir needs  = (32 * number_of_entries) / bytes_per_sector
+    ; entries = file/folder, typically fat12 root (only) entries can hold up to 224 total entries
     mov ax, [bdb_dir_entries_count]
-    shl ax, 5                           ; ax *= 32
-    xor dx, dx                          ; dx = 0
+    shl ax, 5                           ; shift left 5 bits = (ax *= 2^5 == ax *= 32 )
+                                        ; each fat12 dir entry is 32 bytes so total bytes = 32 * num entries
+    xor dx, dx                          ; dx = 0 (dx is higher word while ax is lower word)
+                                        ; div using 32 bit divident -> have to clear dx if 
+                                        ; dividing only 16 bit which is this case
     div word [bdb_bytes_per_sector]     ; number of sectors we need to read
 
-    test dx, dx                         ; if dx != 0, add 1
-    jz .root_dir_after
-    inc ax                              ; division remainder != 0, add 1
+    test dx, dx                         ; check if dx is 0 or not
+    jz .root_dir_after                  ; if 0 then jump if zero to root_dir_after
+    inc ax                              ; if not then increment by 1 vale not byte
                                         ; this means we have a sector only partially filled with entries
 
 
