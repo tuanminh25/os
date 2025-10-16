@@ -17,6 +17,17 @@ Project Goals:
 
 - "FLOW" - optimize for fast, smooth experience 
 
+More specific goals:
+| Area               | Minimum Feature                           | Why It Matters                                      |
+| ------------------ | ----------------------------------------- | --------------------------------------------------- |
+| **Boot + Memory**  | Bootloader loads kernel, paging enabled   | You understand memory management & segmentation     |
+| **Tasking**        | Basic scheduler (round-robin or priority) | You understand concurrency primitives               |
+| **Interrupts**     | Handle timer + keyboard interrupts        | Shows control over CPU state                        |
+| **File/IO System** | Read/write simple FS (FAT12 or custom)    | Demonstrates block device I/O knowledge             |
+| **Syscalls**       | A few system calls for user programs      | Proves you understand kernel ↔ user mode            |
+| **Documentation**  | README + architecture notes               | Shows you can communicate technical systems clearly |
+
+
 ## Current Development Focus
 
 **FAT12 Filesystem Implementation** - Learning and implementing disk operations for this simple filesystem format, which serves as a foundation for storage management.
