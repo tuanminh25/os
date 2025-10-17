@@ -1,5 +1,7 @@
 # FLOW OS
-An x86 operating system project designed for QEMU emulation (for now). This personal project represents my development journey in OS internals, built from scratch to understand low-level system operations.
+An x86 operating system project designed for QEMU emulation (for now). This personal project represents my development journey in OS internals, built from scratch to understand low-level system operations. 
+
+It is not a production graded product so chill out. Just an entry learning step stone to os
 
 Project Goals:
 
