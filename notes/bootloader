@@ -1,0 +1,21 @@
+bootloader choice 
+
+
+initially this project will go in the direction where bootloader will be self-written, however it seems like it would be much hassle to do especially a lot to deal wit assembly so we will switch direction into use another well written bootloader already
+
+
+after a while , we decided to go with GRUB as it seems to be the most robust, easy to use, most compatible
+
+this is other option to consider apart from GRUB if one day we decide to switch:
+
+| Bootloader                    | Typical use               | Pros                                                         | Cons                                      |
+| ----------------------------- | ------------------------- | ------------------------------------------------------------ | ----------------------------------------- |
+| **Limine**                    | Hobby OSDev, x86-64       | Simple, modern, supports Stivale2 protocol, cleaner codebase | Fewer platforms than GRUB, newer project  |
+| **systemd-boot (gummiboot)**  | Modern Linux, UEFI only   | Lightweight, fast, integrates with systemd                   | Only boots EFI executables (no Multiboot) |
+| **rEFInd**                    | Multiboot manager for EFI | Good GUI, autodetects OSes                                   | Not meant for low-level OS dev            |
+| **Coreboot + SeaBIOS/Heads**  | Open firmware stack       | Secure, open hardware                                        | Complex build process, niche              |
+| **U-Boot**                    | Embedded/ARM/RISC-V       | Extremely configurable for boards                            | Not ideal for PCs, more for SoCs          |
+| **Bare-metal custom loaders** | OS development learning   | Full control                                                 | Requires assembly, more work              |
+
+
+with this, we have decided on using combo x86 + GRUB  
