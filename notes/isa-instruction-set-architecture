@@ -1,0 +1,19 @@
+They are set of rules, blue print for other chip vendor to implement their chip
+
+
+Q: hmm, if an intel chip has a micro architecture follows x86 isa also an amd chip, technically saying will an os be able to run on both chip without any modification? Or it requires more from an os to run well and smooth rather than just follow the same instruction architecture set?
+
+
+A: technically it will run. But it might not run at its best. because there are things that might be cpu vendor specific like
+
+- CPU features/extensions → e.g., SSE, AVX, SMT, virtualization, etc. OS checks CPUID flags to use or skip these.
+
+- Power management → different per vendor (AMD P-states, Intel SpeedStep, etc.).
+
+- Scheduling & thermal behavior → thread scheduling tuned for core layout, cache topology, SMT differences.
+
+- Microcode & errata fixes → OS or BIOS may load vendor-specific microcode patches at boot.
+
+-> Basic compability: guaranteed by ISA (no change needed)
+
+-> Optimal performance/ reliance -> achieved by vendor-specific kernel drivers, microcode updates, and tuned schedulers.
