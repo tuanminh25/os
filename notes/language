@@ -82,3 +82,6 @@ Q: what is the beneficial of runtime language? I think they exist for specific p
 A: Runtime languages were designed for productivity, safety, and portability, not raw speed or hardware control.
 
 The main purpose is to abstract memory management and low-level details, allowing developers to focus on logic, features, and rapid development, while the runtime handles hardware/OS specifics.
+
+Q and A: if I want to write driver in C++ (assuming to use some runtime features) then my os must be mature enough to handle memory management for runtime support and also I have to figureout a way to map those os feature with C++ run time features
+
