@@ -1,0 +1,30 @@
+Q: What is tool chain? 
+
+A: Set of programming tools that work together to build software from source code to an executable program
+
+Main component usually has
+
+1. Compiler
+
+Convert source code into machine code / intermediate format
+
+2. Assembler 
+
+Translate assembly code into machine code 
+
+3. Linker 
+
+Combines multiple files and libs into a single executable
+
+4. Libraries
+
+Pre written code 
+
+5. Debugger 
+
+Help find and fix errors in program 
+
+6. Other tools 
+
+Sometimes includes build system, package managers, cross compiler for targeting different platform
+
