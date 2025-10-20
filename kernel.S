@@ -34,17 +34,14 @@ mb2_header_end:
     .globl _start                /* make _start visible to the linker/entry point */
 
 _start:
-    /* Note: GRUB will have set up registers and passed a Multiboot2 info pointer in RBX
-       (if it loaded in 32-bit mode it uses different register conventions; for our
-       simple test we'll not rely on those values). */
+    /* --- Set up a stack --- */
+    mov $0x90000, %rsp        /* set stack somewhere safe, above kernel */
 
-    /* A very small test: write a byte to VGA text buffer to verify we ran.
-       If you run under QEMU and see the character, you know control reached here. */
+    /* --- VGA test (optional, for now) --- */
+    mov $0xb8000, %rdi        /* rdi = VGA text buffer */
+    mov $0x2F41, %ax          /* ax = 'A' with attribute */
+    mov %ax, (%rdi)           /* write character to VGA */
 
-    /* rdi = 0xb8000 (VGA text buffer), rsi = character word, rcx = count */
-    lea 0xb8000(%rip), %rdi      /* rdi <- address of VGA text buffer (RIP-relative load) */
-    mov $0x2F41, %ax             /* ax <- character & attribute (0x41 = 'A', 0x2F = attr) */
-    mov %ax, (%rdi)              /* store ax into VGA buffer (first character cell) */
 
     /* infinite loop so we don't fall off into nowhere */
 1:
