@@ -29,42 +29,62 @@ mb2_header_end:
     /**************************************************/
     /*                KERNEL CODE START               */
     /**************************************************/
-    .section .text               /* executable code section */
-    .align 16                    /* align code on 16 byte boundary (common for x86) */
-    .globl _start                /* make _start visible to the linker/entry point */
+    .section .text
+    .align 16
+    .globl _start
     .code32
 
 _start:
-    /* --- Set up a stack (use our .bss-allocated stack) --- */
+    /* Save Multiboot2 registers to globals before changing %esp */
+    mov %eax, mb_magic
+    mov %ebx, mb_info_ptr
+
+    /* Set up a stack */
     mov $stack_top, %esp
 
-    /* --- VGA string print --- */
-    mov $0xb8000, %edi           /* edi = VGA text buffer (phys mapped identity) */
-    mov $msg, %esi               /* esi = pointer to string (zero-terminated) */
-    mov $0x1F, %ah               /* attribute: bright white on blue background */
-
+    /* Decide message based on Multiboot2 magic */
+    mov mb_magic, %eax
+    cmp $0x36D76289, %eax            /* Multiboot2 magic */
+    jne 1f
+    mov $msg_ok, %esi
+    jmp 2f
 1:
-    lodsb                        /* al = *esi++; */
-    test %al, %al                /* reached NUL? */
-    jz 2f
-    mov %ax, (%edi)              /* write char+attr */
-    add $2, %edi
-    jmp 1b
+    mov $msg_bad, %esi
 
 2:
-    /* Halt forever */
+    /* VGA string print */
+    mov $0xb8000, %edi
+    mov $0x1F, %ah                   /* bright white on blue */
+
 3:
-    hlt
+    lodsb                            /* al = *esi++ */
+    test %al, %al
+    jz 4f
+    mov %ax, (%edi)
+    add $2, %edi
     jmp 3b
 
-    /* --- Read-only data (string) --- */
-    .section .rodata
-msg:
-    .asciz "Hello, OS!"
+4:
+    /* Halt forever */
+5:
+    hlt
+    jmp 5b
 
-    /* --- BSS: kernel stack --- */
+    /* --- Read-only data (strings) --- */
+    .section .rodata
+msg_ok:
+    .asciz "MB2 OK"
+msg_bad:
+    .asciz "MB2 BAD"
+
+    /* --- BSS: kernel stack + saved boot regs --- */
     .section .bss
     .align 16
 stack_bottom:
-    .skip 16384                  /* 16 KiB stack */
+    .skip 16384                      /* 16 KiB stack */
 stack_top:
+    .align 4
+mb_magic:
+    .long 0
+mb_info_ptr:
+    .long 0
