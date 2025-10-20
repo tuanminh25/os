@@ -1,8 +1,11 @@
 # 1️⃣ Assemble the kernel
 as --32 kernel.S -o kernel.o
 
-# 2️⃣ Link kernel into ELF
-ld -m elf_i386 -T linker.ld -o kernel.elf kernel.o -z max-page-size=0x1000
+# 1.5️⃣ Compile C kernel
+gcc -m32 -c kernel.c -o kernel_c.o -ffreestanding -nostdlib -fno-pie
+
+# 2️⃣ Link both object files into ELF
+ld -m elf_i386 -T linker.ld -o kernel.elf kernel.o kernel_c.o -z max-page-size=0x1000
 
 # 3️⃣ Optional: verify ELF is Multiboot2-compliant
 grub-file --is-x86-multiboot2 kernel.elf && echo "OK" || echo "NOT OK"

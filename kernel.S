@@ -42,30 +42,10 @@ _start:
     /* Set up a stack */
     mov $stack_top, %esp
 
-    /* Decide message based on Multiboot2 magic */
-    mov mb_magic, %eax
-    cmp $0x36D76289, %eax            /* Multiboot2 magic */
-    jne 1f
-    mov $msg_ok, %esi
-    jmp 2f
-1:
-    mov $msg_bad, %esi
+    /* Call C kernel main function */
+    call main
 
-2:
-    /* VGA string print */
-    mov $0xb8000, %edi
-    mov $0x1F, %ah                   /* bright white on blue */
-
-3:
-    lodsb                            /* al = *esi++ */
-    test %al, %al
-    jz 4f
-    mov %ax, (%edi)
-    add $2, %edi
-    jmp 3b
-
-4:
-    /* Halt forever */
+    /* If main returns, halt forever */
 5:
     hlt
     jmp 5b
