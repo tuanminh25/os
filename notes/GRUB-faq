@@ -1,0 +1,27 @@
+1️⃣ Why GRUB scans the first 32 KB
+
+It’s not the whole ISO, it’s the first 32 KB of the kernel binary loaded into memory.
+
+GRUB looks here to find the Multiboot2 header quickly without scanning the entire file.
+
+The 32 KB limit is part of the Multiboot2 spec; headers outside this range may be ignored.
+
+2️⃣ What .align 8 means
+
+Align = memory address multiple requirement. .align 8 forces the header to start at an address divisible by 8.
+
+CPUs are faster when reading aligned memory, and some instructions may fault on misaligned access.
+
+If you don’t align: GRUB may misread the header fields, and your kernel might fail to boot.
+
+
+
+
+
+Purpose of grub.cfg
+
++ grub.cfg is the GRUB bootloader configuration file.
+
++ It tells GRUB what kernels or OS entries to boot, default options, and timeout.
+
++ Without it, GRUB may start but won’t know which OS or kernel to load.

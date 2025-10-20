@@ -1,0 +1,34 @@
+The very first kernel.S
+
+1. First 32 KB → Multiboot2 Header
+
+Correct: GRUB scans this for a Multiboot2 header.
+
+Includes: magic number, architecture, header length, checksum, and at least an end tag.
+
+Marks start and end so GRUB knows the header size.
+
+
+2. Kernel code start
+
+.section .text → declares executable code.
+
+.align 16 → 16-byte alignment is preferred on x86_64 for performance (CPU fetches instructions faster, some instructions require 16-byte alignment).
+
+8-byte alignment would work, but 16 is common for modern CPUs.
+
+
+3. _start
+
+Writes "A" to VGA text buffer as a simple test to verify the kernel runs.
+
+
+4. Halt + infinite loop
+
+hlt → halts CPU until the next interrupt (low-power wait).
+
+It does not permanently stop the CPU, it just pauses until something like a timer or keyboard interrupt occurs.
+
+jmp 1b → loops back to hlt, creating an infinite loop.
+
+Why loop? Because the kernel has nothing else to do, and without the loop, the CPU would execute whatever garbage is after your code (crash/undefined behavior).

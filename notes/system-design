@@ -1,0 +1,10 @@
+Alright so this would be the main entry on the big decision such as bootloader, kind of kernel, boot protocol, os features stuff
+
+1. Bootloader
+So we start off with boot, well, after a while of researching, we chose GRUB as our way to go as it seems to be widely supported and somewhat beginner friendly
+
+2. Boot protocol
+As a follow through, we will design the kernel compliance to Multiboot2 protocol as it is the best fit for GRUB 
+
+
+
