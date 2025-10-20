@@ -27,23 +27,44 @@ mb2_header_end:
 
 
     /**************************************************/
-    /*                KERNEL CODE START              */
+    /*                KERNEL CODE START               */
     /**************************************************/
     .section .text               /* executable code section */
-    .align 16                    /* align code on 16 byte boundary (common for x86_64) */
+    .align 16                    /* align code on 16 byte boundary (common for x86) */
     .globl _start                /* make _start visible to the linker/entry point */
+    .code32
 
 _start:
-    /* --- Set up a stack --- */
-    mov $0x90000, %rsp        /* set stack somewhere safe, above kernel */
+    /* --- Set up a stack (use our .bss-allocated stack) --- */
+    mov $stack_top, %esp
 
-    /* --- VGA test (optional, for now) --- */
-    mov $0xb8000, %rdi        /* rdi = VGA text buffer */
-    mov $0x2F41, %ax          /* ax = 'A' with attribute */
-    mov %ax, (%rdi)           /* write character to VGA */
+    /* --- VGA string print --- */
+    mov $0xb8000, %edi           /* edi = VGA text buffer (phys mapped identity) */
+    mov $msg, %esi               /* esi = pointer to string (zero-terminated) */
+    mov $0x1F, %ah               /* attribute: bright white on blue background */
 
-
-    /* infinite loop so we don't fall off into nowhere */
 1:
-    hlt                         /* halt CPU until next interrupt (low-power spin) */
-    jmp 1b                      /* jump back to label 1 (infinite loop) */
+    lodsb                        /* al = *esi++; */
+    test %al, %al                /* reached NUL? */
+    jz 2f
+    mov %ax, (%edi)              /* write char+attr */
+    add $2, %edi
+    jmp 1b
+
+2:
+    /* Halt forever */
+3:
+    hlt
+    jmp 3b
+
+    /* --- Read-only data (string) --- */
+    .section .rodata
+msg:
+    .asciz "Hello, OS!"
+
+    /* --- BSS: kernel stack --- */
+    .section .bss
+    .align 16
+stack_bottom:
+    .skip 16384                  /* 16 KiB stack */
+stack_top:

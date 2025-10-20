@@ -1,8 +1,8 @@
 # 1️⃣ Assemble the kernel
-as --64 kernel.S -o kernel.o
+as --32 kernel.S -o kernel.o
 
 # 2️⃣ Link kernel into ELF
-ld -T linker.ld -o kernel.elf kernel.o -z max-page-size=0x1000
+ld -m elf_i386 -T linker.ld -o kernel.elf kernel.o -z max-page-size=0x1000
 
 # 3️⃣ Optional: verify ELF is Multiboot2-compliant
 grub-file --is-x86-multiboot2 kernel.elf && echo "OK" || echo "NOT OK"
