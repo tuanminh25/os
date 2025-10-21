@@ -38,7 +38,13 @@ The project is being rewritten with **GRUB bootloader** for improved boot protoc
 
 ## ⚡ Quick Start
 
-### Installation
+### Prerequisites
+- QEMU emulator
+- GCC cross-compiler (x86 target)
+- GNU Make
+- GRUB tools (`grub-mkrescue`, `grub-file`)
+
+### Installation & Build
 
 ```bash
 # 1. Clone the repository
@@ -47,13 +53,30 @@ cd os
 
 # 2. Build and run
 ./command.sh
+# or use the detailed build script
+./run-os.sh
 ```
 
-### Prerequisites
-- QEMU emulator
-- GCC cross-compiler (x86 target)
-- GNU Make
-- GRUB tools
+### Build Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `./command.sh` | Quick build and run (recommended for most use) |
+| `./run-os.sh` | Detailed build with step-by-step verification |
+| `./clean.sh` | Clean all build artifacts and temporary files |
+
+### Common Commands
+
+```bash
+# Clean build artifacts
+./clean.sh
+
+# Build and run OS
+./run-os.sh
+
+# Clean and rebuild
+./clean.sh && ./run-os.sh
+```
 
 ---
 
@@ -96,6 +119,6 @@ Check out the `/notes` directory for detailed documentation on:
 
 <div align="center">
 
-***~ Learning and exploring ~***
+**~ Learning and exploring ~**
 
 </div>
