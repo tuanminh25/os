@@ -96,6 +96,6 @@ Check out the `/notes` directory for detailed documentation on:
 
 <div align="center">
 
-**Learning and exploration**
+***~ Learning and exploring ~***
 
 </div>
