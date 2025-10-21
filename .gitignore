@@ -1,0 +1,142 @@
+# ===========================
+# OS Development .gitignore
+# ===========================
+
+# Build Artifacts
+# ---------------
+*.o
+*.obj
+*.elf
+*.bin
+*.iso
+*.img
+*.qcow2
+
+# Build Directories
+build/
+bin/
+obj/
+isodir/
+iso/boot/
+
+# Kernel Binaries
+kernel
+kernel.elf
+kernel.bin
+kernel.o
+kernel_c.o
+multiboot_header.o
+myos.bin
+os.iso
+
+# Bootloader
+*.mbr
+stage1.bin
+stage2.bin
+
+# Assembly/Linker Output
+*.lst
+*.map
+*.sym
+
+# Debug Files
+# -----------
+*.log
+*.dump
+serial.log
+debug.log
+qemu.log
+
+# Disassembly
+*.dis
+*.dmp
+
+# Editor/IDE Files
+# ----------------
+# VSCode
+.vscode/
+*.code-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.*.sw[a-z]
+
+# Emacs
+\#*\#
+.\#*
+
+# JetBrains (CLion, IntelliJ)
+.idea/
+*.iml
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# OS-Specific Files
+# -----------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# Temporary Files
+# ---------------
+*.tmp
+*.temp
+*.bak
+*.cache
+
+# GRUB Files (generated)
+# ----------------------
+iso/boot/grub/
+iso/boot/*.bin
+iso/boot/*.elf
+
+# Archives (optional - uncomment if you don't want to track them)
+# ----------------------------------------------------------------
+# *.tar
+# *.tar.gz
+# *.zip
+
+# Documentation Build (if using tools like Doxygen)
+# --------------------------------------------------
+# docs/html/
+# docs/latex/
+
+# Core dumps
+# ----------
+core
+core.*
+vgcore.*
+
+# Dependency files (if using GCC -MMD)
+# ------------------------------------
+*.d
+
+# Python (if you have build scripts)
+# -----------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+env/
+
+# Test outputs
+# ------------
+test_output/
+*.test
+
