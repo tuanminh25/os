@@ -89,3 +89,76 @@ Creates a .bss section for uninitialized or zero-initialized data.
 COMMON handles global variables that aren’t explicitly placed in .data or .bss.
 
 The linker knows that .bss doesn’t need to store actual data in the binary; it’s just memory that the loader should zero out.
+
+
+ENTRY(_start)
+
+SECTIONS
+{
+  . = 0x00100000;
+
+  /* Force multiboot2 header to stay and appear first */
+  .multiboot_header ALIGN(8) : {
+    KEEP(*(.multiboot2))
+  }
+
+  /* Code and read-only data */
+  .text ALIGN(0x1000) : {
+    *(.text*)
+    *(.rodata*)
+  }
+
+  /* Data and BSS */
+  .data : { *(.data) }
+  .bss  : { *(.bss COMMON) }
+}
+
+
+here in the first ever linker, we can see that read only data is embedded with text, this is because 
+
+
+- Both .text and .rodata are static, known at compile-time.
+
+- Both do not change at runtime.
+
+- Putting them together simplifies memory layout.
+
+In bigger OSes (like Linux), .rodata is often separate, mainly for finer-grained memory protection (e.g., .text can be executable but not writable, .rodata can be readable but not executable).
+
+
+right now it is still coupled in my code because i still directly move memory:
+
+start:
+    /* Save Multiboot2 registers to globals before changing %esp */
+    mov %eax, mb_magic
+    mov %ebx, mb_info_ptr
+
+    /* Set up a stack */
+    mov $stack_top, %esp
+
+    /* Call C kernel main function */
+    call main
+
+    /* If main returns, halt forever */
+5:
+    hlt
+    jmp 5b
+
+    /* --- Read-only data (strings) --- */
+    .section .rodata
+msg_ok:
+    .asciz "MB2 OK"
+msg_bad:
+    .asciz "MB2 BAD"
+
+    /* --- BSS: kernel stack + saved boot regs --- */
+    .section .bss
+    .align 16
+stack_bottom:
+    .skip 16384                      /* 16 KiB stack */
+stack_top:
+    .align 4
+mb_magic:
+    .long 0
+mb_info_ptr:
+    .long 0
