@@ -1,0 +1,9 @@
+Unified Memory (Apple M1/M2 terminology)
+
+Apple calls it Unified Memory Architecture (UMA).
+
+The key idea: CPU, GPU, and other accelerators share the same physical memory pool.
+
+So instead of having separate RAM for CPU and GPU, all components access the same RAM.
+
+It’s still RAM — fast, directly addressable — not the SSD.

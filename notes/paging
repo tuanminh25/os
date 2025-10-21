@@ -1,0 +1,19 @@
+1️⃣ Yes, the OS “lives” in RAM
+
+When your computer is running, the entire OS kernel (text, data, bss, heap, stacks, etc.) sits in RAM.
+
+RAM is fast, directly accessible by the CPU. This is why the kernel and all running processes are loaded there — CPU cannot execute code directly from SSD.
+
+Even user-space programs (games, browsers, etc.) are also loaded into RAM when running.
+
+2️⃣ What happens if you run out of physical RAM?
+
+This is where virtual memory comes in:
+
+The OS uses paging to map virtual addresses to physical addresses.
+
+If RAM is full, the OS can swap pages out to storage (SSD/HDD) temporarily.
+
+This storage-backed memory is much slower, but it allows the system to appear as if there’s “more RAM” than physically exists.
+
+This is why you sometimes hear that a system “uses SSD as RAM” — it’s really swap space / page file, managed by the OS.
