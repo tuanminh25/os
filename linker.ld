@@ -17,5 +17,10 @@ SECTIONS
 
   /* Data and BSS */
   .data : { *(.data) }
-  .bss  : { *(.bss COMMON) }
+  .bss  : {
+      __bss_start = .;   /* mark start address of BSS */
+      *(.bss*)           /* include all .bss sections from object files */
+      *(COMMON)          /* include COMMON symbols */
+      __bss_end = .;     /* mark end address of BSS */
+  }
 }

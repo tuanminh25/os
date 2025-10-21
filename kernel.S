@@ -33,19 +33,34 @@ mb2_header_end:
     .align 16
     .globl _start
     .code32
-
+    .extern __bss_start
+    .extern __bss_end
 _start:
-    /* Save Multiboot2 registers to globals before changing %esp */
-    mov %eax, mb_magic
-    mov %ebx, mb_info_ptr
+    /* Save MB2 regs in registers (no stack yet) */
+    mov %eax, %edx                /* save magic */
+    mov %ebx, %ebp                /* save info ptr */
 
-    /* Set up a stack */
+    /* Make C runtime safe: no interrupts, clear BSS */
+    cli
+    cld
+    mov $__bss_start, %edi
+    mov $__bss_end, %ecx
+    sub %edi, %ecx                /* bytes to clear = end - start */
+    xor %eax, %eax                /* zero to store */
+    shr $2, %ecx                  /* dwords to clear */
+    rep stosl                     /* zero BSS in 32-bit chunks */
+    /* (optional) clear tail bytes if needed; most linkers align BSS */
+
+    /* Set up a stack after BSS is clean */
     mov $stack_top, %esp
 
-    /* Call C kernel main function */
+    /* Now write saved MB2 regs into globals in BSS */
+    mov %edx, mb_magic
+    mov %ebp, mb_info_ptr
+
+    /* Enter C */
     call main
 
-    /* If main returns, halt forever */
 5:
     hlt
     jmp 5b
