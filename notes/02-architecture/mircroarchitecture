@@ -1,7 +1,0 @@
-A new word, microarchitecture
-
-So technically, set of instruction like ARM or x86 is a general guide book 
-
-Some company like  amd, creates CPU. The way CPU physically executes the x86 instruction is called "microarchitecture". For example, "Zen 5"
-
-Correct: it is more like the way Instruction Set Architecture is implemented in a particular processor
