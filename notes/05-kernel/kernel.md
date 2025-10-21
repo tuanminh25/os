@@ -1,29 +1,43 @@
-Right, so the kernel itself is a manager 
+# Kernel Memory Layout
 
-It manages itself and the user space application (memory)
+## Overview
 
-Normally it will starts somewhere after 1MiB, it first starts with
+The kernel itself is a manager. It manages itself and the user space application (memory).
 
-1. Text (or the kernel program code)
+---
 
-2. Then it comes to Initiallized data segment (from the kernel)
+## Kernel Memory Layout Sequence
 
-3. Then it comes to Uninitiallized data segment or bss (declared or init = 0 from the kernel )
+Normally it will starts somewhere after 1MiB, it first starts with:
 
-4. Then it comes to Heap, grows upward
+### 1. Text
+The kernel program code
 
-Heap would store what 
+### 2. Initialized Data Segment
+From the kernel
 
+### 3. Uninitialized Data Segment (BSS)
+Declared or init = 0 from the kernel
+
+### 4. Heap
+Grows upward
+
+**Heap stores:** Kernel structures (task structs, page tables, device info)
+
+```
 --- A blank unallocated memory here which will be dynamically allocated ---
+```
 
-5. The stack top (growing downward)
+### 5. Stack Top
+Growing downward
 
-Stack would store local variable
+**Stack stores:** Local variables
 
+---
 
+## 1️⃣ Visual Representation: Kernel Memory Layout
 
-better representation would be like this
-
+```
 0x00000000 ── BIOS + Bootloader (reserved)
 
 0x00100000 ── Kernel starts here
@@ -41,12 +55,13 @@ better representation would be like this
 [ ... free memory for dynamic use ... ]
 
 [ Stack top ]      ← Kernel stack (grows downward)
+```
 
+---
 
+## 2️⃣ Each User-Space Process Layout
 
-
-2️⃣ Each user-space process layout
-
+```
 [ Text (code) ]      ← Executable instructions
 
 [ Data (initialized) ] ← Global/static initialized variables
@@ -56,9 +71,9 @@ better representation would be like this
 [ Heap ]             ← Process dynamic allocations (malloc, new, textures, etc.)
 
 [ Stack top ]        ← Process stack (grows downward)
+```
 
-
-and yea kernel manage those thing:
+### How the Kernel Manages Processes
 
 - Each process has its own virtual address space; kernel maps them to physical RAM.
 
@@ -66,12 +81,13 @@ and yea kernel manage those thing:
 
 - Heap grows upward, stack grows downward — eventually, if they collide, the process crashes (stack overflow/heap overflow).
 
-3️⃣ How it all fits together
+---
 
-Kernel is the manager: small footprint (heap + stack + code/data/bss)
+## 3️⃣ How It All Fits Together
 
-Processes are the workers: each gets its own text/data/bss/heap/stack
-
-Kernel heap/stack store metadata about all user processes and memory allocations
-
-Physical RAM holds both kernel and user-space memory at the same time, coordinated by the ke
+| Component | Role | Details |
+|-----------|------|---------|
+| **Kernel** | The manager | Small footprint (heap + stack + code/data/bss) |
+| **Processes** | The workers | Each gets its own text/data/bss/heap/stack |
+| **Kernel heap/stack** | Metadata storage | Store metadata about all user processes and memory allocations |
+| **Physical RAM** | Unified storage | Holds both kernel and user-space memory at the same time, coordinated by the kernel |
