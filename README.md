@@ -52,8 +52,6 @@ git clone git@github.com:tuanminh25/os.git
 cd os
 
 # 2. Build and run
-./command.sh
-# or use the detailed build script
 ./run-os.sh
 ```
 
@@ -61,7 +59,6 @@ cd os
 
 | Script | Purpose |
 |--------|---------|
-| `./command.sh` | Quick build and run (recommended for most use) |
 | `./run-os.sh` | Detailed build with step-by-step verification |
 | `./clean.sh` | Clean all build artifacts and temporary files |
 
@@ -119,6 +116,6 @@ Check out the `/notes` directory for detailed documentation on:
 
 <div align="center">
 
-**~ Learning and exploring ~**
+*** ~ Learning and exploring ~ ***
 
 </div>
